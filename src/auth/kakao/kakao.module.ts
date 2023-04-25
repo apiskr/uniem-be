@@ -4,6 +4,6 @@ import { KakaoService } from './kakao.service';
 
 @Module({
   controllers: [KakaoController],
-  providers: [KakaoService],
+  providers: [{ provide: 'KakaoService', useClass: KakaoService }],
 })
 export class KakaoModule {}
