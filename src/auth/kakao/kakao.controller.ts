@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { Inject, Get, Redirect, Query } from '@nestjs/common';
 import { KakaoService } from './kakao.service';
 
-@Controller('kakao')
+@Controller('auth/kakao')
 export class KakaoController {
   constructor(
     @Inject('KakaoService')
