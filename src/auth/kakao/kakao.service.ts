@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ResGetAuthCode } from 'src/api/kakao';
-import { kakao } from 'src/api/kakao';
+import { ResGetAuthCode } from 'src/api/kakaoAuth';
+import { kakaoAuth } from 'src/api/kakaoAuth';
 import { envNames } from 'src/constants/envNames';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class KakaoService {
   }
 
   public openKakaoSignIn(): ResGetAuthCode {
-    return kakao.getAuthCode(this.KAKAO_API_KEY, this.REDIRECT_URI);
+    return kakaoAuth.getAuthCode(this.KAKAO_API_KEY, this.REDIRECT_URI);
   }
 
   public async getTokenFromKakao(code: string) {
@@ -25,7 +25,7 @@ export class KakaoService {
   }
 
   private async postKakaoToken(code: string) {
-    const res = await kakao.postKakaoToken(
+    const res = await kakaoAuth.postKakaoToken(
       this.KAKAO_API_KEY,
       this.REDIRECT_URI,
       code,
