@@ -13,7 +13,7 @@ const getAuthCode = (
   REDIRECT_URI: string,
 ): ResGetAuthCode => {
   return {
-    url: `${baseURLs.KAKAO}${routes.AUTH}/authorize?client_id=${KAKAO_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`,
+    url: `${baseURLs.KAKAO}${routes.OAUTH}/authorize?client_id=${KAKAO_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`,
   };
 };
 
@@ -23,7 +23,7 @@ const postKakaoToken = async (
   code: string,
 ) => {
   return await kakaoInstance.post(
-    `${routes.AUTH}/token`,
+    `${routes.OAUTH}/token`,
     {
       grant_type: 'authorization_code',
       client_id,

@@ -1,3 +1,3 @@
 export const routes = {
-  AUTH: '/auth',
+  OAUTH: '/oauth',
 };
