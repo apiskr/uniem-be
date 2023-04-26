@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { baseURLs } from 'src/constants/baseUrls';
 import { routes } from 'src/constants/routes';
 
@@ -17,11 +17,21 @@ const getAuthCode = (
   };
 };
 
+export type ResPostKakaoToken = {
+  access_token: string;
+  token_type: string;
+  refresh_token: string;
+  id_token: string;
+  expires_in: number;
+  scope: string;
+  refresh_token_expires_in: number;
+};
+
 const postKakaoToken = async (
   client_id: string,
   redirect_uri: string,
   code: string,
-) => {
+): Promise<AxiosResponse<ResPostKakaoToken>> => {
   return await kakaoAuthInstance.post(
     `${routes.OAUTH}/token`,
     {
