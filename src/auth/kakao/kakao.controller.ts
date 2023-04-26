@@ -15,13 +15,20 @@ export class KakaoController {
     return this.kakaoService.openKakaoSignIn();
   }
 
+  // ?
   @Get(`/redirect`)
-  getTokenFromKakao(
+  async getTokenFromKakao(
     @Query('code') code?: string,
     @Query('error') error?: string,
   ) {
     if (code.length === 0) return this.kakaoService.failKakaoSignIn(error);
-    this.kakaoService.getTokenFromKakao(code);
-    return;
+
+    const kakaoToken = await this.kakaoService.getTokenFromKakao(code);
+    const res = await this.kakaoService.getUserInfo(kakaoToken.getAccessToken);
+    console.log(res.data);
+    return {
+      accessToken: kakaoToken.getAccessToken,
+      refreshToken: kakaoToken.getRefreshToken,
+    };
   }
 }

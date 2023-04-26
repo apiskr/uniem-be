@@ -3,6 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { ResGetAuthCode } from 'src/api/kakaoAuth';
 import { kakaoAuth } from 'src/api/kakaoAuth';
 import { envNames } from 'src/constants/envNames';
+import { KakaoTokenDto } from '../kakao.dto';
+import { kakaoApi } from 'src/api/kakaoApi';
 
 @Injectable()
 export class KakaoService {
@@ -22,8 +24,7 @@ export class KakaoService {
 
   public async getTokenFromKakao(code: string) {
     const res = await this.postKakaoToken(code);
-    //  [Todo] getTokenFromKakao 반환값으로 토큰을 받아서 처리하기
-    return;
+    return new KakaoTokenDto(res.data); // [Temp] Dto 이렇게 사용하면 되나?
   }
 
   private async postKakaoToken(code: string) {
@@ -38,5 +39,9 @@ export class KakaoService {
   // [Todo] error 출력 확인해보기 + 공통된 에러 처리 로직 필요
   public failKakaoSignIn(error: string) {
     return { error };
+  }
+
+  public async getUserInfo(accessToken: string) {
+    return await kakaoApi.getUserInfo(accessToken);
   }
 }

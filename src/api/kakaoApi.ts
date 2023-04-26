@@ -1,13 +1,13 @@
 import axios from 'axios';
 import { baseURLs } from 'src/constants/baseUrls';
 
-const ROUTE = '/v1/oidc/userinfo';
+const ROUTE = '/v2/user/me';
 
 const kakaoApiInstance = axios.create({
   baseURL: baseURLs.KAKAO_API,
 });
 
-const getOidcUserinfo = async (accessToken: string) => {
+const getUserInfo = async (accessToken: string) => {
   return await kakaoApiInstance.get(`${ROUTE}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -16,4 +16,4 @@ const getOidcUserinfo = async (accessToken: string) => {
   });
 };
 
-export const kakaoApi = { getOidcUserinfo };
+export const kakaoApi = { getUserInfo };
