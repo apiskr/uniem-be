@@ -20,7 +20,8 @@ export class KakaoController {
     @Query('code') code?: string,
     @Query('error') error?: string,
   ) {
-    if (code.length !== 0) return this.kakaoService.getTokenFromKakao(code);
-    else return this.kakaoService.failKakaoSignIn(error);
+    if (code.length === 0) return this.kakaoService.failKakaoSignIn(error);
+    this.kakaoService.getTokenFromKakao(code);
+    return;
   }
 }

@@ -21,7 +21,9 @@ export class KakaoService {
   }
 
   public async getTokenFromKakao(code: string) {
-    return await this.postKakaoToken(code);
+    const res = await this.postKakaoToken(code);
+    //  [Todo] getTokenFromKakao 반환값으로 토큰을 받아서 처리하기
+    return;
   }
 
   private async postKakaoToken(code: string) {
@@ -30,7 +32,7 @@ export class KakaoService {
       this.REDIRECT_URI,
       code,
     );
-    return res.data;
+    return res;
   }
 
   // [Todo] error 출력 확인해보기 + 공통된 에러 처리 로직 필요
