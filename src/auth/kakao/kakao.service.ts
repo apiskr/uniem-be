@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ResGetAuthCode } from 'src/api/kakaoAuth';
 import { kakaoAuth } from 'src/api/kakaoAuth';
@@ -38,7 +38,7 @@ export class KakaoService {
 
   // [Todo] error 출력 확인해보기 + 공통된 에러 처리 로직 필요
   public failKakaoSignIn(error: string) {
-    return { error };
+    throw new UnauthorizedException(error);
   }
 
   public async getUserInfo(accessToken: string) {
