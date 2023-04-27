@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { KakaoModule } from './kakao/kakao.module';
+import { AuthService } from './auth.service';
+import { KakaoService } from './kakao.service';
 
 @Module({
-  imports: [KakaoModule],
+  providers: [AuthService, { provide: 'KakaoService', useClass: KakaoService }],
 })
 export class AuthModule {}

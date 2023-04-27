@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { ResGetAuthCode } from 'src/api/kakaoAuth';
 import { kakaoAuth } from 'src/api/kakaoAuth';
 import { envNames } from 'src/constants/envNames';
-import { KakaoTokenDto } from '../kakao.dto';
+import { KakaoTokenDto } from './kakao.dto';
 import { kakaoApi } from 'src/api/kakaoApi';
 
 @Injectable()
@@ -36,12 +36,16 @@ export class KakaoService {
     return res;
   }
 
-  // [Todo] error 출력 확인해보기 + 공통된 에러 처리 로직 필요
+  // [Todo] error 출력 확인해보기
   public failKakaoSignIn(error: string) {
     throw new UnauthorizedException(error);
   }
 
   public async getUserInfo(accessToken: string) {
     return await kakaoApi.getUserInfo(accessToken);
+  }
+
+  public async getUniemUserInfoByKakaoUserId(kakaoUserId: number) {
+    // [Todo] kakaoUserId로 DB 조회 후 없으면 회원가입, 있으면 로그인 redirect
   }
 }
