@@ -6,7 +6,9 @@ import { envNames } from 'src/constants/envNames';
 import { KakaoTokenDto } from './kakao.dto';
 import { kakaoApi } from 'src/api/kakaoApi';
 import { Repository } from 'typeorm';
-import { KakaoAccountEntity } from 'src/user/kakao-account/kakao-account.entity';
+import { KakaoAccountEntity } from 'src/user/kakao-account.entity';
+import { UserEntity } from 'src/user/user.entity';
+import { PropsSignIn } from './auth.service';
 
 @Injectable()
 export class KakaoService {
@@ -30,7 +32,7 @@ export class KakaoService {
 
   public async getTokenFromKakao(code: string) {
     const res = await this.postKakaoToken(code);
-    return new KakaoTokenDto(res.data); // [Temp] Dto 이렇게 사용하면 되나?
+    return new KakaoTokenDto(res.data); // [Todo] Dto 굳이 쓰는 느낌
   }
 
   private async postKakaoToken(code: string) {
@@ -42,7 +44,6 @@ export class KakaoService {
     return res;
   }
 
-  // [Todo] error 출력 확인해보기
   public failKakaoSignIn(error: string) {
     throw new UnauthorizedException(error);
   }
@@ -61,4 +62,25 @@ export class KakaoService {
       },
     });
   }
+
+  public async signUp({ resUserInfo, userEntity, accessToken }: PropsSignUp) {
+    const userKakaoChanelList = await kakaoApi.getUserKakaoChanelList(
+      accessToken,
+    );
+
+    const kakaoAccount = this.kakaoAccountRepository.create({
+      id: resUserInfo.data.id,
+      profileNickname: resUserInfo.data.properties.nickname,
+      accountEmail: resUserInfo.data.kakao_account.email,
+      plusfriends: userKakaoChanelList.data.channels[0].relation,
+      user: userEntity,
+    });
+
+    await this.kakaoAccountRepository.save(kakaoAccount);
+  }
 }
+
+// [Todo] type 정리
+type PropsSignUp = PropsSignIn & {
+  userEntity: UserEntity;
+};
