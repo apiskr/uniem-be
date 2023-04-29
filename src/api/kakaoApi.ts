@@ -8,7 +8,7 @@ const kakaoApiInstance = axios.create({
 });
 
 type ResGetUserInfo = {
-  id: number;
+  id: string;
   connected_at: string;
   properties: {
     nickname: string;
