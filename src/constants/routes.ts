@@ -1,3 +1,3 @@
-export const routes = {
-  OAUTH: '/oauth',
-};
+export const enum routes {
+  OAUTH = '/oauth',
+}
