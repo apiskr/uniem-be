@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ResGetAuthCode } from 'src/api/kakaoAuth';
 import { kakaoAuth } from 'src/api/kakaoAuth';
-import { envNames } from 'src/constants/envNames';
+import { ENV_NAME } from 'src/constants/envName';
 import { KakaoTokenDto } from './kakao.dto';
 import { kakaoApi } from 'src/api/kakaoApi';
 import { Repository } from 'typeorm';
@@ -21,9 +21,9 @@ export class KakaoService {
     private readonly kakaoAccountRepository: Repository<KakaoAccountEntity>,
   ) {
     this.KAKAO_API_KEY = this.configService.get<string>(
-      envNames.KAKAO_REST_API_KEY,
+      ENV_NAME.KAKAO_REST_API_KEY,
     );
-    this.REDIRECT_URI = this.configService.get<string>(envNames.REDIRECT_URI);
+    this.REDIRECT_URI = this.configService.get<string>(ENV_NAME.REDIRECT_URI);
   }
 
   public openKakaoSignIn(): ResGetAuthCode {

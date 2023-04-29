@@ -1,10 +1,10 @@
 import axios, { AxiosResponse } from 'axios';
-import { baseURLs } from 'src/constants/baseUrls';
+import { BASE_URL } from 'src/constants/baseUrl';
 
 const Route = '/oauth';
 
 const kakaoAuthInstance = axios.create({
-  baseURL: baseURLs.KAKAO_AUTH,
+  baseURL: BASE_URL.KAKAO_AUTH,
 });
 
 export type ResGetAuthCode = { url: string };
@@ -14,7 +14,7 @@ const getAuthCode = (
   REDIRECT_URI: string,
 ): ResGetAuthCode => {
   return {
-    url: `${baseURLs.KAKAO_AUTH}${Route}/authorize?client_id=${KAKAO_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`,
+    url: `${BASE_URL.KAKAO_AUTH}${Route}/authorize?client_id=${KAKAO_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`,
   };
 };
 

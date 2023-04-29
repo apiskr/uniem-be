@@ -1,4 +1,4 @@
-export const enum envNames {
+export const enum ENV_NAME {
   KAKAO_REST_API_KEY = 'KAKAO_REST_API_KEY',
   REDIRECT_URI = 'REDIRECT_URI',
 }

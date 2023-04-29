@@ -1,12 +1,12 @@
 import axios, { AxiosResponse } from 'axios';
-import { baseURLs } from 'src/constants/baseUrls';
+import { BASE_URL } from 'src/constants/baseUrl';
 import { plusfriends } from 'src/user/kakao-account.entity';
 
 const V1 = 'v1';
 const V2 = 'v2';
 
 const kakaoApiInstance = axios.create({
-  baseURL: baseURLs.KAKAO_API,
+  baseURL: BASE_URL.KAKAO_API,
 });
 
 export type ResGetUserInfo = {
