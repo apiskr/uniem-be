@@ -1,15 +1,16 @@
 import { Controller, Inject, Get, Redirect, Query } from '@nestjs/common';
 import { KakaoService } from './kakao.service';
 import { AuthService } from './auth.service';
+import { PROVIDER } from 'src/constants/provider';
 
 const KAKAO = 'kakao';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    @Inject('KakaoService')
+    @Inject(PROVIDER.KAKAO_SERVICE)
     private readonly kakaoService: KakaoService,
-    @Inject('AuthService')
+    @Inject(PROVIDER.AUTH_SERVICE)
     private readonly authService: AuthService,
   ) {}
 

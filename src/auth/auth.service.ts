@@ -5,13 +5,14 @@ import { UserEntity } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { KakaoService } from './kakao.service';
+import { PROVIDER } from 'src/constants/provider';
 
 @Injectable()
 export class AuthService {
   public constructor(
-    @Inject('KakaoService')
+    @Inject(PROVIDER.KAKAO_SERVICE)
     private readonly kakaoService: KakaoService,
-    @Inject('UserRepository')
+    @Inject(PROVIDER.USER_REPOSITORY)
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 

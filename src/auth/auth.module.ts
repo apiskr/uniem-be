@@ -5,12 +5,13 @@ import { userProvider } from 'src/database/user.provider';
 import { kakaoAccountProvider } from 'src/database/kakaoAccount.provider';
 import { DatabaseModule } from 'src/database/database.module';
 import { AuthController } from './auth.controller';
+import { PROVIDER } from 'src/constants/provider';
 
 @Module({
   imports: [DatabaseModule],
   providers: [
-    { provide: 'AuthService', useClass: AuthService },
-    { provide: 'KakaoService', useClass: KakaoService },
+    { provide: PROVIDER.AUTH_SERVICE, useClass: AuthService },
+    { provide: PROVIDER.KAKAO_SERVICE, useClass: KakaoService },
     ...userProvider,
     ...kakaoAccountProvider,
   ],

@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { KakaoAccountEntity } from 'src/user/kakao-account.entity';
 import { UserEntity } from 'src/user/user.entity';
 import { PropsSignIn } from './auth.service';
+import { PROVIDER } from 'src/constants/provider';
 
 @Injectable()
 export class KakaoService {
@@ -17,7 +18,7 @@ export class KakaoService {
 
   public constructor(
     private readonly configService: ConfigService,
-    @Inject('KakaoAccountRepository')
+    @Inject(PROVIDER.KAKAO_ACCOUNT_REPOSITORY)
     private readonly kakaoAccountRepository: Repository<KakaoAccountEntity>,
   ) {
     this.KAKAO_API_KEY = this.configService.get<string>(
