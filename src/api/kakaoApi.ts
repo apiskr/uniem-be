@@ -1,13 +1,14 @@
 import axios, { AxiosResponse } from 'axios';
 import { baseURLs } from 'src/constants/baseUrls';
 
-const ROUTE = '/v2/user/me';
+const V1 = 'v1';
+const V2 = 'v2';
 
 const kakaoApiInstance = axios.create({
   baseURL: baseURLs.KAKAO_API,
 });
 
-type ResGetUserInfo = {
+export type ResGetUserInfo = {
   id: string;
   connected_at: string;
   properties: {
@@ -40,7 +41,7 @@ type ResGetUserInfo = {
 const getUserInfo = async (
   accessToken: string,
 ): Promise<AxiosResponse<ResGetUserInfo>> => {
-  return await kakaoApiInstance.get(`${ROUTE}`, {
+  return await kakaoApiInstance.get(`${V2}/user/me`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
@@ -48,4 +49,27 @@ const getUserInfo = async (
   });
 };
 
-export const kakaoApi = { getUserInfo };
+type ResGetUserKakaoChanelList = {
+  user_id: string;
+  channels: {
+    channel_uuid: string;
+    channel_public_id: string;
+    relation: 'ADDED' | 'BLOCKED' | 'NONE';
+    updated_at?: string;
+  }[];
+};
+
+const getUserKakaoChanelList = async (
+  accessToken: string,
+): Promise<AxiosResponse<ResGetUserKakaoChanelList>> => {
+  return await kakaoApiInstance.get(
+    `${V1}/api/talk/channels?channel_public_ids=["${process.env.APP_CHANEL_ID}"]`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+};
+
+export const kakaoApi = { getUserInfo, getUserKakaoChanelList };
