@@ -1,5 +1,6 @@
 import { Controller, Inject, Get, Redirect, Query } from '@nestjs/common';
 import { KakaoService } from './kakao.service';
+import { AuthService } from './auth.service';
 
 const KAKAO = 'kakao';
 
@@ -8,6 +9,8 @@ export class AuthController {
   constructor(
     @Inject('KakaoService')
     private readonly kakaoService: KakaoService,
+    @Inject('AuthService')
+    private readonly authService: AuthService,
   ) {}
 
   @Get(`${KAKAO}/`)
@@ -23,20 +26,18 @@ export class AuthController {
     @Query('error') error?: string,
   ) {
     if (code.length === 0) return this.kakaoService.failKakaoSignIn(error);
-
-    const kakaoToken = await this.kakaoService.getTokenFromKakao(code);
-    // [Temp] 한 번 요청을 저장하면 좋을까?
-    const resUserInfo = await this.kakaoService.getUserInfo(
-      kakaoToken.getAccessToken,
-    );
-    const kakaoUserId = resUserInfo.data.id;
-    const resUniemUserInfo =
-      await this.kakaoService.getUniemUserInfoByKakaoUserId(kakaoUserId);
-
-    if (resUniemUserInfo === null) {
-      // [Todo] 회원가입 redirect
-    } else {
-      // [Todo] 로그인 redirect
+    try {
+      const kakaoToken = await this.kakaoService.getTokenFromKakao(code);
+      const resUserInfo = await this.kakaoService.getUserInfo(
+        kakaoToken.getAccessToken,
+      );
+      // 이 로직 자체를 서비스로 넣어야 할 듯
+      return this.authService.signIn({
+        resUserInfo,
+        accessToken: kakaoToken.getAccessToken,
+      });
+    } catch (e) {
+      return this.kakaoService.failKakaoSignIn(e);
     }
   }
 }
