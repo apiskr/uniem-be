@@ -6,6 +6,13 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 
+const enum grade {
+  first = 1,
+  second = 2,
+  third = 3,
+  fourth = 4,
+  fifth = 5,
+}
 @Entity()
 export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -14,8 +21,8 @@ export class UserEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 50, comment: "User's major" })
   major: string;
 
-  @Column({ type: 'tinyint', comment: "User's grade" })
-  grade: number;
+  @Column()
+  grade: grade;
 
   @Column({ type: 'int', comment: "User's point" })
   point: number;
