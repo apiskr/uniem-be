@@ -18,7 +18,7 @@ export const databaseProviders = [
         subscribers: ['src/subscriber/**/*.ts'], // [Todo] subscriber 추가
         migrations: [__dirname + '/migrations/**/*.ts'],
         migrationsTableName: 'migrations',
-        entities: [__dirname + '/**/*.entity.{js,ts}'],
+        entities: [__dirname + '/../**/*.entity.{js,ts}'],
       });
       return dataSource.initialize();
     },
