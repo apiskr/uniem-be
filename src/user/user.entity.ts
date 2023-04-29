@@ -19,10 +19,10 @@ export class UserEntity extends BaseEntity {
   id: number;
 
   @Column({ type: 'varchar', length: 50, comment: "User's major" })
-  major: string;
+  major?: string;
 
   @Column()
-  grade: grade;
+  grade?: grade;
 
   @Column({ type: 'int', comment: "User's point" })
   point: number;
@@ -35,7 +35,7 @@ export class UserEntity extends BaseEntity {
   fieldsOfConfidence?: string;
 
   @Column({ comment: "User's refreshToken" })
-  refreshToken: string;
+  refreshToken?: string;
 
   @CreateDateColumn({ name: 'create_at', comment: '생성일' })
   createdAt: Date;
