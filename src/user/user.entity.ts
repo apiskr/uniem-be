@@ -18,13 +18,18 @@ export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 
-  @Column({ type: 'varchar', length: 50, comment: "User's major" })
-  major?: string;
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    length: 50,
+    comment: "User's major",
+  })
+  major: string;
 
-  @Column()
-  grade?: grade;
+  @Column({ nullable: true })
+  grade: grade;
 
-  @Column({ type: 'int', comment: "User's point" })
+  @Column({ type: 'int', nullable: true, comment: "User's point" })
   point: number;
 
   @Column({
@@ -32,9 +37,9 @@ export class UserEntity extends BaseEntity {
     nullable: true,
     comment: "User's fields of confidence",
   })
-  fieldsOfConfidence?: string;
+  fieldsOfConfidence: string;
 
-  @Column({ comment: "User's refreshToken" })
+  @Column({ nullable: true, comment: "User's refreshToken" })
   refreshToken?: string;
 
   @CreateDateColumn({ name: 'create_at', comment: '생성일' })
