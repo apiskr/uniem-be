@@ -1,17 +1,23 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ResGetAuthCode } from 'src/api/kakaoAuth';
 import { kakaoAuth } from 'src/api/kakaoAuth';
 import { envNames } from 'src/constants/envNames';
 import { KakaoTokenDto } from './kakao.dto';
 import { kakaoApi } from 'src/api/kakaoApi';
+import { Repository } from 'typeorm';
+import { KakaoAccountEntity } from 'src/user/kakao-account/kakao-account.entity';
 
 @Injectable()
 export class KakaoService {
   private KAKAO_API_KEY: string;
   private REDIRECT_URI: string;
 
-  public constructor(private readonly configService: ConfigService) {
+  public constructor(
+    private readonly configService: ConfigService,
+    @Inject('KakaoAccountRepository')
+    private readonly kakaoAccountRepository: Repository<KakaoAccountEntity>,
+  ) {
     this.KAKAO_API_KEY = this.configService.get<string>(
       envNames.KAKAO_REST_API_KEY,
     );
@@ -45,7 +51,14 @@ export class KakaoService {
     return await kakaoApi.getUserInfo(accessToken);
   }
 
-  public async getUniemUserInfoByKakaoUserId(kakaoUserId: number) {
-    // [Todo] kakaoUserId로 DB 조회 후 없으면 회원가입, 있으면 로그인 redirect
+  public async getUniemUserInfoByKakaoUserId(kakaoUserId: string) {
+    return await this.kakaoAccountRepository.findOne({
+      select: {
+        id: true,
+      },
+      where: {
+        id: kakaoUserId,
+      },
+    });
   }
 }
