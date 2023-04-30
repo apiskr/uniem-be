@@ -21,22 +21,16 @@ export class AuthController {
   }
 
   @Get(`${KAKAO}/redirect`)
-  @Redirect()
-  async getTokenFromKakao(
+  async signInByKakao(
     @Query('code') code?: string,
     @Query('error') error?: string,
   ) {
     if (code.length === 0) return this.kakaoService.failKakaoSignIn(error);
     try {
-      const kakaoToken = await this.kakaoService.getTokenFromKakao(code);
-      const resUserInfo = await this.kakaoService.getUserInfo(
-        kakaoToken.getAccessToken,
+      const kakaoAccessToken = await this.kakaoService.getAccessTokenFromKakao(
+        code,
       );
-      // 이 로직 자체를 서비스로 넣어야 할 듯
-      return this.authService.signIn({
-        resUserInfo,
-        accessToken: kakaoToken.getAccessToken,
-      });
+      return await this.authService.signIn(kakaoAccessToken);
     } catch (e) {
       return this.kakaoService.failKakaoSignIn(e);
     }

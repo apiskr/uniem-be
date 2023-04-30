@@ -31,9 +31,9 @@ export class KakaoService {
     return kakaoAuth.getAuthCode(this.KAKAO_API_KEY, this.REDIRECT_URI);
   }
 
-  public async getTokenFromKakao(code: string) {
+  public async getAccessTokenFromKakao(code: string) {
     const res = await this.postKakaoToken(code);
-    return new KakaoTokenDto(res.data); // [Todo] Dto 굳이 쓰는 느낌
+    return new KakaoTokenDto(res.data).getAccessToken; // [Todo] Dto 굳이 쓰는 느낌
   }
 
   private async postKakaoToken(code: string) {
@@ -53,26 +53,32 @@ export class KakaoService {
     return await kakaoApi.getUserInfo(accessToken);
   }
 
-  public async getUniemUserInfoByKakaoUserId(kakaoUserId: string) {
-    return await this.kakaoAccountRepository.findOne({
+  public async getAppUserIdByKakaoUserId(kakaoUserId: string) {
+    const kakaoAccount = await this.kakaoAccountRepository.findOne({
       select: {
         id: true,
       },
       where: {
         id: kakaoUserId,
       },
+      relations: ['user'],
     });
+    return kakaoAccount.user.id;
   }
 
-  public async signUp({ resUserInfo, userEntity, accessToken }: PropsSignUp) {
+  public async signUp({
+    resKakaoUserInfo,
+    userEntity,
+    kakaoAccessToken,
+  }: PropsSignUp) {
     const userKakaoChanelList = await kakaoApi.getUserKakaoChanelList(
-      accessToken,
+      kakaoAccessToken,
     );
 
     const kakaoAccount = this.kakaoAccountRepository.create({
-      id: resUserInfo.data.id,
-      profileNickname: resUserInfo.data.properties.nickname,
-      accountEmail: resUserInfo.data.kakao_account.email,
+      id: resKakaoUserInfo.data.id,
+      profileNickname: resKakaoUserInfo.data.properties.nickname,
+      accountEmail: resKakaoUserInfo.data.kakao_account.email,
       plusfriends: userKakaoChanelList.data.channels[0].relation,
       user: userEntity,
     });

@@ -6,6 +6,8 @@ import { Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { KakaoService } from './kakao.service';
 import { PROVIDER } from 'src/constants/provider';
+import { JwtService } from '@nestjs/jwt';
+import { TOKEN } from 'src/constants/token';
 
 @Injectable()
 export class AuthService {
@@ -14,26 +16,33 @@ export class AuthService {
     private readonly kakaoService: KakaoService,
     @Inject(PROVIDER.USER_REPOSITORY)
     private readonly userRepository: Repository<UserEntity>,
+    private readonly jwtService: JwtService,
   ) {}
 
-  public async signIn({ resUserInfo, accessToken }: PropsSignIn) {
-    const resUniemUserInfo =
-      await this.kakaoService.getUniemUserInfoByKakaoUserId(
-        resUserInfo.data.id,
-      );
+  // [Todo] Exception 클래스 공부 + try catch 문으로 예외처리
 
-    if (resUniemUserInfo === null) {
-      await this.signUp({ resUserInfo, accessToken });
-      console.log('회원가입 성공');
-      return `${process.env.CLIENT_URL}/signup}`;
-    } else {
-      // [Todo] 토큰 발급 과정 추가 및 토큰 포함한 url 반환
-      console.log('로그인 성공');
-      return process.env.CLIENT_URL;
-    }
+  public async signIn(kakaoAccessToken: string) {
+    const resKakaoUserInfo = await this.kakaoService.getUserInfo(
+      kakaoAccessToken,
+    );
+    const resUserId = await this.kakaoService.getAppUserIdByKakaoUserId(
+      resKakaoUserInfo.data.id,
+    );
+
+    if (resUserId === null)
+      await this.signUp({ resKakaoUserInfo, kakaoAccessToken });
+
+    const accessToken = this.jwtService.sign({ sub: resUserId });
+    const refreshToken = this.jwtService.sign(
+      { sub: resUserId },
+      { expiresIn: TOKEN.EXPIRES_IN },
+    );
+
+    await this.userRepository.update({ id: resUserId }, { refreshToken });
+    return { url: process.env.CLIENT_URL, accessToken };
   }
 
-  private async signUp({ resUserInfo, accessToken }: PropsSignIn) {
+  private async signUp({ resKakaoUserInfo, kakaoAccessToken }: PropsSignIn) {
     const user = this.userRepository.create({
       id: uuid(),
       major: null,
@@ -46,9 +55,9 @@ export class AuthService {
     await this.userRepository.save(user);
 
     await this.kakaoService.signUp({
-      resUserInfo,
+      resKakaoUserInfo,
       userEntity: user,
-      accessToken,
+      kakaoAccessToken,
     });
   }
 
@@ -59,6 +68,6 @@ export class AuthService {
 }
 
 export type PropsSignIn = {
-  resUserInfo: AxiosResponse<ResGetUserInfo, any>;
-  accessToken: string;
+  resKakaoUserInfo: AxiosResponse<ResGetUserInfo, any>;
+  kakaoAccessToken: string;
 };
