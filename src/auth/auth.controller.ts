@@ -18,7 +18,7 @@ import { ReissueGuard } from './auth.guard';
 import { UserGuard } from 'src/user/user.guard';
 
 const KAKAO = 'kakao';
-
+// [Todo] 개인 정보 만료 및 삭제 구현
 @Controller('auth')
 export class AuthController {
   constructor(
