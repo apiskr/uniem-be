@@ -14,6 +14,7 @@ import { ReissueGuard } from './auth.guard';
     { provide: PROVIDER.AUTH_SERVICE, useClass: AuthService },
     { provide: PROVIDER.KAKAO_SERVICE, useClass: KakaoService },
     { provide: PROVIDER.REISSUE_GUARD, useClass: ReissueGuard },
+    { provide: PROVIDER.USER_GUARD, useClass: ReissueGuard },
     ...userProvider,
     ...kakaoAccountProvider,
   ],

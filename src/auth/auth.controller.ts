@@ -15,6 +15,7 @@ import { PROVIDER } from 'src/constants/provider';
 import { Request, Response } from 'express';
 import { COOKIE, TOKEN } from 'src/constants/bearer';
 import { ReissueGuard } from './auth.guard';
+import { UserGuard } from 'src/user/user.guard';
 
 const KAKAO = 'kakao';
 
@@ -39,17 +40,26 @@ export class AuthController {
     @Query('error') error: string,
     @Res() res: Response,
   ) {
-    if (!!code || code.length === 0)
-      // 이 로직을 없애는게 맞을 듯
+    if (!code || code.length === 0)
       return this.kakaoService.failKakaoSignIn(error);
     try {
       const kakaoAccessToken = await this.kakaoService.getAccessTokenFromKakao(
         code,
       );
 
-      const { url, accessToken, refreshToken } = await this.authService.signIn(
+      const resKakaoUserInfo = await this.kakaoService.getUserInfo(
         kakaoAccessToken,
       );
+
+      const resUserId = await this.kakaoService.getAppUserIdByKakaoUserId(
+        resKakaoUserInfo.data.id,
+      );
+
+      const { url, accessToken, refreshToken } = await this.authService.signIn({
+        resUserId,
+        resKakaoUserInfo,
+        kakaoAccessToken,
+      });
 
       res.cookie(TOKEN.REFRESH_TOKEN, refreshToken, {
         maxAge: COOKIE.COOKIE_MAX_AGE,
@@ -63,7 +73,19 @@ export class AuthController {
 
   @Post('reissue-access')
   @UseGuards(ReissueGuard)
-  reissueAccessToken(@Req() req: Request & { userId: string }) {
+  reissueAccessToken(@Req() req: RequestWithUserId) {
     return this.authService.reissueAccessToken(req.userId);
   }
+
+  @Post('sign-out')
+  @UseGuards(UserGuard)
+  async signOut(@Req() req: RequestWithUserId, @Res() res: Response) {
+    // [Temp] 카카오 로그아웃을 해주지 않는 중
+    res.clearCookie(TOKEN.REFRESH_TOKEN);
+    await this.authService.signOut(req.userId);
+
+    return res.send({ id: req.userId });
+  }
 }
+
+type RequestWithUserId = Request & { userId: string };

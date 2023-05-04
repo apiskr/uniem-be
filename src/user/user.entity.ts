@@ -13,10 +13,11 @@ const enum grade {
   fourth = 4,
   fifth = 5,
 }
+// [Todo] nickname을 카카오 엔티티가 아닌 여기서 관리하기
 @Entity()
 export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
   @Column({
     type: 'varchar',

@@ -71,6 +71,7 @@ export class KakaoService {
     userEntity,
     kakaoAccessToken,
   }: PropsSignUp) {
+    // [Todo] resKakaoUserInfo에 담겨져 오는게 맞는 듯
     const userKakaoChanelList = await kakaoApi.getUserKakaoChanelList(
       kakaoAccessToken,
     );

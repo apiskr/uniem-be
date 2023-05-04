@@ -20,15 +20,12 @@ export class AuthService {
   ) {}
 
   // [Todo] Exception 클래스 공부 + try catch 문으로 예외처리
-
-  public async signIn(kakaoAccessToken: string) {
-    const resKakaoUserInfo = await this.kakaoService.getUserInfo(
-      kakaoAccessToken,
-    );
-    const resUserId = await this.kakaoService.getAppUserIdByKakaoUserId(
-      resKakaoUserInfo.data.id,
-    );
-
+  // [Todo] kakaoService에 너무 의존적임. 분리 필요
+  public async signIn({
+    resUserId,
+    resKakaoUserInfo,
+    kakaoAccessToken,
+  }: PropssignIn) {
     if (resUserId === null)
       await this.signUp({ resKakaoUserInfo, kakaoAccessToken });
 
@@ -57,6 +54,7 @@ export class AuthService {
     });
     await this.userRepository.save(user);
 
+    // [Todo] 분리시켜주고 싶음
     await this.kakaoService.signUp({
       resKakaoUserInfo,
       userEntity: user,
@@ -81,7 +79,9 @@ export class AuthService {
     return { accessToken: newAccessToken };
   }
 
-  // [Todo] 로그아웃 -> 리프레시 토큰 삭제해주고, 쿠키 삭제해주기
+  public async signOut(userId: string) {
+    await this.userRepository.update({ id: userId }, { refreshToken: null });
+  }
 
   // [Todo] 회원탈퇴
   // [Todo] 회원정보 수정
@@ -89,6 +89,12 @@ export class AuthService {
 }
 
 export type PropsSignIn = {
+  resKakaoUserInfo: AxiosResponse<ResGetUserInfo, any>;
+  kakaoAccessToken: string;
+};
+
+type PropssignIn = {
+  resUserId: string;
   resKakaoUserInfo: AxiosResponse<ResGetUserInfo, any>;
   kakaoAccessToken: string;
 };
