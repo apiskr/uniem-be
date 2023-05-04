@@ -46,6 +46,7 @@ export class AuthGuard implements CanActivate {
  * 유효하다면 accessToken 재발급
  */
 
+@Injectable()
 export class ReissueGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
