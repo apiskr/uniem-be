@@ -11,21 +11,20 @@ import { TOKEN } from 'src/constants/bearer';
 
 /**
  * @description
- * refreshToken이 유효한지 확인
- * 유효하다면 accessToken 재발급
+ * accessToken이 유효한지 확인
  */
 
 @Injectable()
-export class ReissueGuard implements CanActivate {
+export class UserGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
   canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
-    const refreshToken = this.extractTokenFromCookie(request);
+    const accessToken = this.extractTokenFromHeader(request);
 
-    if (!refreshToken) throw new BadRequestException();
+    if (!accessToken) throw new BadRequestException();
     try {
-      const payload = this.jwtService.verify(refreshToken, {
+      const payload = this.jwtService.verify(accessToken, {
         secret: process.env.JWT_SECRET,
       });
       request.userId = payload.sub;
@@ -35,8 +34,8 @@ export class ReissueGuard implements CanActivate {
     return true;
   }
 
-  private extractTokenFromCookie(request: Request): string | null {
-    const [type, token] = request.cookies?.refreshToken?.split(' ') ?? [];
+  private extractTokenFromHeader(request: Request): string | null {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === TOKEN.BEARER_PREFIX ? token : null;
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { ResGetUserInfo } from 'src/api/kakaoApi';
 import { UserEntity } from 'src/user/user.entity';

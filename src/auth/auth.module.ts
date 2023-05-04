@@ -6,14 +6,13 @@ import { kakaoAccountProvider } from 'src/database/kakaoAccount.provider';
 import { DatabaseModule } from 'src/database/database.module';
 import { AuthController } from './auth.controller';
 import { PROVIDER } from 'src/constants/provider';
-import { AuthGuard, ReissueGuard } from './auth.guard';
+import { ReissueGuard } from './auth.guard';
 
 @Module({
   imports: [DatabaseModule],
   providers: [
     { provide: PROVIDER.AUTH_SERVICE, useClass: AuthService },
     { provide: PROVIDER.KAKAO_SERVICE, useClass: KakaoService },
-    { provide: PROVIDER.AUTH_GUARD, useClass: AuthGuard },
     { provide: PROVIDER.REISSUE_GUARD, useClass: ReissueGuard },
     ...userProvider,
     ...kakaoAccountProvider,
