@@ -7,6 +7,6 @@ export const userProvider = [
     provide: PROVIDER.USER_REPOSITORY,
     useFactory: (dataSource: DataSource) =>
       dataSource.getRepository(UserEntity),
-    inject: ['DATA_SOURCE'],
+    inject: [PROVIDER.DATABASE_PROVIDER],
   },
 ];

@@ -7,6 +7,6 @@ export const kakaoAccountProvider = [
     provide: PROVIDER.KAKAO_ACCOUNT_REPOSITORY,
     useFactory: (dataSource: DataSource) =>
       dataSource.getRepository(KakaoAccountEntity),
-    inject: ['DATA_SOURCE'],
+    inject: [PROVIDER.DATABASE_PROVIDER],
   },
 ];
