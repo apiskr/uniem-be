@@ -8,6 +8,7 @@ import {
   Res,
   Req,
   UseGuards,
+  Delete,
 } from '@nestjs/common';
 import { KakaoService } from './kakao.service';
 import { AuthService } from './auth.service';
@@ -80,6 +81,19 @@ export class AuthController {
     await this.authService.signOut(req.userId);
 
     return res.send({ id: req.userId });
+  }
+
+  @Delete()
+  @UseGuards(UserGuard)
+  async deleteUser(@Req() req: RequestWithUserId, @Res() res: Response) {
+    // [Temp] 카카오 로그아웃을 해주지 않는 중
+    try {
+      res.clearCookie(TOKEN.REFRESH_TOKEN);
+      await this.authService.deleteUser(req.userId);
+      return res.send({ userId: req.userId });
+    } catch (e) {
+      return res.send(e);
+    }
   }
 }
 

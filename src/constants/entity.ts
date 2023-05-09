@@ -1,3 +1,8 @@
+export const enum ENTITY {
+  USER = 'USER',
+  UNIVERSITY = 'UNIVERSITY',
+}
+
 export const enum ADDED_KAKAO_PLUS_FLRIEND {
   ADDED = 'ADDED',
   BLOCKED = 'BLOCKED',
@@ -11,8 +16,4 @@ export const enum GRADE {
   FOURTH = 4,
   FIFTH = 5,
   GRADUATED = 6,
-}
-
-export const enum ENTITY {
-  USER = 'USER',
 }

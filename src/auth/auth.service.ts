@@ -1,5 +1,5 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { UserEntity } from 'src/user/user.entity';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import { UserEntity } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 import { PROVIDER } from 'src/constants/provider';
@@ -7,7 +7,6 @@ import { JwtService } from '@nestjs/jwt';
 import { TOKEN } from 'src/constants/bearer';
 import { UserInfo } from './kakao.service';
 
-// [Todo] 잘 되는지 테스트하기
 @Injectable()
 export class AuthService {
   public constructor(
@@ -32,7 +31,7 @@ export class AuthService {
   public async signIn(userInfo: UserInfo) {
     const resUserId = await this.getAppUserIdByKakaoUserId(userInfo.id);
 
-    if (resUserId === null) await this.signUp(userInfo);
+    if (resUserId === null) await this.createUserEntity(userInfo);
 
     const accessToken = this.jwtService.sign({
       sub: resUserId,
@@ -47,7 +46,7 @@ export class AuthService {
     return { url: process.env.CLIENT_URL, accessToken, refreshToken };
   }
 
-  private async signUp(userInfo: UserInfo) {
+  private async createUserEntity(userInfo: UserInfo) {
     const user = this.userRepository.create({
       id: uuid(),
       nickname: userInfo.properties.nickname,
@@ -83,6 +82,12 @@ export class AuthService {
 
   public async signOut(userId: string) {
     await this.userRepository.update({ id: userId }, { refreshToken: null });
+  }
+
+  public async deleteUser(userId: string) {
+    const res = await this.userRepository.delete({ id: userId });
+    if (res.affected === 0)
+      throw new BadRequestException('존재하지 않는 유저입니다.');
   }
 
   // [Todo] 회원탈퇴
