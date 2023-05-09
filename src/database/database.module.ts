@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 import { databaseProviders } from './database.provider';
 import { userProvider } from './user.provider';
-import { kakaoAccountProvider } from './kakaoAccount.provider';
 
 @Module({
-  providers: [...databaseProviders, ...userProvider, ...kakaoAccountProvider],
-  exports: [...databaseProviders, ...userProvider, ...kakaoAccountProvider],
+  providers: [...databaseProviders, ...userProvider],
+  exports: [...databaseProviders, ...userProvider],
 })
 export class DatabaseModule {}

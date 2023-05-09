@@ -1,25 +1,19 @@
-import { Injectable, UnauthorizedException, Inject } from '@nestjs/common';
-// import { ConfigService } from '@nestjs/config';
+import { HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ResGetAuthCode } from 'src/api/kakaoAuth';
 import { kakaoAuth } from 'src/api/kakaoAuth';
 import { KakaoTokenDto } from './kakao.dto';
 import { kakaoApi } from 'src/api/kakaoApi';
-import { Repository } from 'typeorm';
-import { KakaoAccountEntity } from 'src/user/kakao-account.entity';
-import { UserEntity } from 'src/user/user.entity';
-import { PropsSignIn } from './auth.service';
-import { PROVIDER } from 'src/constants/provider';
+import { ResGetUserInfo } from 'src/api/kakaoApi';
+import { ADDED_KAKAO_PLUS_FLRIEND } from 'src/constants/entity';
+import { AxiosError } from 'axios';
 
 @Injectable()
 export class KakaoService {
   private KAKAO_API_KEY: string;
   private REDIRECT_URI: string;
 
-  public constructor(
-    @Inject(PROVIDER.KAKAO_ACCOUNT_REPOSITORY)
-    private readonly kakaoAccountRepository: Repository<KakaoAccountEntity>,
-  ) {
-    this.KAKAO_API_KEY = process.env.KAKAO_API_KEY;
+  public constructor() {
+    this.KAKAO_API_KEY = process.env.KAKAO_REST_API_KEY;
     this.REDIRECT_URI = process.env.REDIRECT_URI;
   }
 
@@ -41,50 +35,26 @@ export class KakaoService {
     return res;
   }
 
-  public failKakaoSignIn(error: string) {
-    throw new UnauthorizedException(error);
-  }
-
-  public async getUserInfo(accessToken: string) {
-    return await kakaoApi.getUserInfo(accessToken);
-  }
-
-  public async getAppUserIdByKakaoUserId(kakaoUserId: string) {
-    const kakaoAccount = await this.kakaoAccountRepository.findOne({
-      select: {
-        id: true,
-      },
-      where: {
-        id: kakaoUserId,
-      },
-      relations: ['user'],
+  // [Todo] 이게 맞을까
+  public failKakaoSignIn(error: AxiosError) {
+    throw new UnauthorizedException({
+      message: error.message,
+      status: HttpStatus.UNAUTHORIZED,
     });
-    return kakaoAccount.user.id;
   }
 
-  public async signUp({
-    resKakaoUserInfo,
-    userEntity,
-    kakaoAccessToken,
-  }: PropsSignUp) {
-    // [Todo] resKakaoUserInfo에 담겨져 오는게 맞는 듯
-    const userKakaoChanelList = await kakaoApi.getUserKakaoChanelList(
-      kakaoAccessToken,
+  public async getUserInfo(accessToken: string): Promise<UserInfo> {
+    const resGetUserInfo = await kakaoApi.getUserInfo(accessToken);
+    const resGetUserKakaoChanelList = await kakaoApi.getUserKakaoChanelList(
+      accessToken,
     );
-
-    const kakaoAccount = this.kakaoAccountRepository.create({
-      id: resKakaoUserInfo.data.id,
-      profileNickname: resKakaoUserInfo.data.properties.nickname,
-      accountEmail: resKakaoUserInfo.data.kakao_account.email,
-      plusfriends: userKakaoChanelList.data.channels[0].relation,
-      user: userEntity,
-    });
-
-    await this.kakaoAccountRepository.save(kakaoAccount);
+    return {
+      ...resGetUserInfo.data,
+      addedKakaoPlusfriend: resGetUserKakaoChanelList.data.channels[0].relation,
+    };
   }
 }
 
-// [Todo] type 정리
-type PropsSignUp = PropsSignIn & {
-  userEntity: UserEntity;
+export type UserInfo = ResGetUserInfo & {
+  addedKakaoPlusfriend: ADDED_KAKAO_PLUS_FLRIEND;
 };

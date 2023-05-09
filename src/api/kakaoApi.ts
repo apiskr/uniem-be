@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { BASE_URL } from 'src/constants/baseUrl';
-import { plusfriends } from 'src/user/kakao-account.entity';
+import { ADDED_KAKAO_PLUS_FLRIEND } from 'src/constants/entity';
 
 const V1 = 'v1';
 const V2 = 'v2';
@@ -55,7 +55,7 @@ type ResGetUserKakaoChanelList = {
   channels: {
     channel_uuid: string;
     channel_public_id: string;
-    relation: plusfriends;
+    relation: ADDED_KAKAO_PLUS_FLRIEND;
     updated_at?: string;
   }[];
 };

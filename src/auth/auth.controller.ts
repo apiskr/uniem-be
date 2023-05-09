@@ -16,6 +16,7 @@ import { Request, Response } from 'express';
 import { COOKIE, TOKEN } from 'src/constants/bearer';
 import { ReissueGuard } from './auth.guard';
 import { UserGuard } from 'src/user/user.guard';
+import { AxiosError } from 'axios';
 
 const KAKAO = 'kakao';
 // [Todo] 개인 정보 만료 및 삭제 구현
@@ -37,7 +38,7 @@ export class AuthController {
   @Get(`${KAKAO}/redirect`)
   async signInByKakao(
     @Query('code') code: string,
-    @Query('error') error: string,
+    @Query('error') error: AxiosError,
     @Res() res: Response,
   ) {
     if (!code || code.length === 0)
@@ -51,14 +52,8 @@ export class AuthController {
         kakaoAccessToken,
       );
 
-      const resUserId = await this.kakaoService.getAppUserIdByKakaoUserId(
-        resKakaoUserInfo.data.id,
-      );
-
       const { url, accessToken, refreshToken } = await this.authService.signIn({
-        resUserId,
-        resKakaoUserInfo,
-        kakaoAccessToken,
+        ...resKakaoUserInfo,
       });
 
       res.cookie(TOKEN.REFRESH_TOKEN, refreshToken, {

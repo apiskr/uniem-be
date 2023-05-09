@@ -1,33 +1,38 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { AxiosResponse } from 'axios';
-import { ResGetUserInfo } from 'src/api/kakaoApi';
 import { UserEntity } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
-import { KakaoService } from './kakao.service';
 import { PROVIDER } from 'src/constants/provider';
 import { JwtService } from '@nestjs/jwt';
 import { TOKEN } from 'src/constants/bearer';
+import { UserInfo } from './kakao.service';
 
+// [Todo] 잘 되는지 테스트하기
 @Injectable()
 export class AuthService {
   public constructor(
-    @Inject(PROVIDER.KAKAO_SERVICE)
-    private readonly kakaoService: KakaoService,
     @Inject(PROVIDER.USER_REPOSITORY)
     private readonly userRepository: Repository<UserEntity>,
     private readonly jwtService: JwtService,
   ) {}
 
+  private async getAppUserIdByKakaoUserId(kakaoUserId: string) {
+    const kakaoAccount = await this.userRepository.findOne({
+      select: {
+        kakaoUserId: true,
+      },
+      where: {
+        kakaoUserId,
+      },
+    });
+    return kakaoAccount?.id ?? null;
+  }
+
   // [Todo] Exception 클래스 공부 + try catch 문으로 예외처리
-  // [Todo] kakaoService에 너무 의존적임. 분리 필요
-  public async signIn({
-    resUserId,
-    resKakaoUserInfo,
-    kakaoAccessToken,
-  }: PropssignIn) {
-    if (resUserId === null)
-      await this.signUp({ resKakaoUserInfo, kakaoAccessToken });
+  public async signIn(userInfo: UserInfo) {
+    const resUserId = await this.getAppUserIdByKakaoUserId(userInfo.id);
+
+    if (resUserId === null) await this.signUp(userInfo);
 
     const accessToken = this.jwtService.sign({
       sub: resUserId,
@@ -42,24 +47,21 @@ export class AuthService {
     return { url: process.env.CLIENT_URL, accessToken, refreshToken };
   }
 
-  private async signUp({ resKakaoUserInfo, kakaoAccessToken }: PropsSignIn) {
+  private async signUp(userInfo: UserInfo) {
     const user = this.userRepository.create({
       id: uuid(),
+      nickname: userInfo.properties.nickname,
       major: null,
       grade: null,
       point: 0,
       fieldsOfConfidence: null,
       refreshToken: null,
+      kakaoUserId: userInfo.id,
+      kakaoAccountEmail: userInfo.kakao_account.email,
+      addedKakaoPlusfriend: userInfo.addedKakaoPlusfriend,
       createdAt: new Date(),
     });
     await this.userRepository.save(user);
-
-    // [Todo] 분리시켜주고 싶음
-    await this.kakaoService.signUp({
-      resKakaoUserInfo,
-      userEntity: user,
-      kakaoAccessToken,
-    });
   }
 
   public async accessTokenValidation(accessToken: string) {
@@ -87,14 +89,3 @@ export class AuthService {
   // [Todo] 회원정보 수정
   // [Todo] 회원정보 조회
 }
-
-export type PropsSignIn = {
-  resKakaoUserInfo: AxiosResponse<ResGetUserInfo, any>;
-  kakaoAccessToken: string;
-};
-
-type PropssignIn = {
-  resUserId: string;
-  resKakaoUserInfo: AxiosResponse<ResGetUserInfo, any>;
-  kakaoAccessToken: string;
-};
