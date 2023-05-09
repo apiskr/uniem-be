@@ -4,8 +4,11 @@ import {
   Column,
   BaseEntity,
   CreateDateColumn,
+  OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { ADDED_KAKAO_PLUS_FLRIEND, ENTITY, GRADE } from 'src/constants/entity';
+import { UniversityEntity } from './university.entity';
 
 // [Todo] 대학교 정보 관리하기
 @Entity(ENTITY.USER)
@@ -15,6 +18,9 @@ export class UserEntity extends BaseEntity {
 
   @Column({ length: 50, comment: "User's nickname" })
   nickname: string;
+
+  @Column({ nullable: true, comment: "User's University" })
+  university: string;
 
   @Column({
     type: 'varchar',
@@ -51,4 +57,8 @@ export class UserEntity extends BaseEntity {
 
   @CreateDateColumn({ name: 'create_at', comment: '생성일' })
   createdAt: Date;
+
+  @OneToMany(() => UniversityEntity, (university) => university.code)
+  @JoinColumn({ name: 'university' })
+  universityEntity: UniversityEntity;
 }
