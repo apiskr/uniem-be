@@ -4,7 +4,7 @@ import {
   Column,
   BaseEntity,
   CreateDateColumn,
-  OneToMany,
+  ManyToMany,
   JoinColumn,
 } from 'typeorm';
 import { ADDED_KAKAO_PLUS_FLRIEND, ENTITY, GRADE } from 'src/constants/entity';
@@ -58,7 +58,7 @@ export class UserEntity extends BaseEntity {
   @CreateDateColumn({ name: 'create_at', comment: '생성일' })
   createdAt: Date;
 
-  @OneToMany(() => UniversityEntity, (university) => university.code)
+  @ManyToMany(() => UniversityEntity, (university) => university.code)
   @JoinColumn({ name: 'university' })
   universityEntity: UniversityEntity;
 }
